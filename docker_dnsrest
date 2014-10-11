@@ -92,7 +92,8 @@ def main():
 
     api.start()
     dns.start()
-    gevent.signal(signal.SIGINT, stop, api, dns)
+    for signum in (signal.SIGTERM, signal.SIGINT):
+        gevent.signal(signum, stop, api, dns)
 
     client = docker.Client(args.docker)
     monitor = DockerMonitor(client, registry)
