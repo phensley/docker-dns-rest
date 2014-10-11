@@ -187,7 +187,7 @@ class Node(object):
                 self._addr = None
             elif sub:
                 sub._addr = None
-        else:
+        elif sub:
             sub._remove(label)
 
         if sub and sub._is_empty():
