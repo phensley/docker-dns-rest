@@ -89,13 +89,15 @@ When you stop the `www` container, the names will be unregistered:
 Now start the `www` container again and the names will be registered again under the new IP address:
 
     % docker start www
-    % docker inspect -f '{{.NetworkSettings.IPAddress}}' www
-    172.17.0.4
 
     ... dns logs ...
     2014-10-11T15:29:37.374072 [dnsrest] setting www (83854cf229) as active
     2014-10-11T15:29:37.374209 [dnsrest] added *.example.com. -> 172.17.0.4
     2014-10-11T15:29:37.374286 [dnsrest] added www.staging.example.com. -> 172.17.0.4
+
+    ... confirm the ip is correct ...
+    % docker inspect -f '{{.NetworkSettings.IPAddress}}' www
+    172.17.0.4
 
 You can use the DNS server from your containers using:
 
@@ -117,7 +119,7 @@ You can use the DNS server from your containers using:
     2014-10-11T15:32:54.874238 [dnsrest] resolved foo.example.com. -> 172.17.0.4
     2014-10-11T15:36:40.487780 [dnsrest] resolved www.staging.example.com. -> 172.17.0.4
 
-The DNS server will also forward any names which do not match, to the resolver you specify (default is `8.8.8.8`). This can be disabled by setting the `no-recursion` command line option:
+The DNS server will also forward any names which do not match, to the resolver you specify (default is `8.8.8.8`). This can be disabled by setting the `--no-recursion` command line option:
     
     root@e776fff8d971:/# ping github.com
     PING github.com (192.30.252.130) 56(84) bytes of data.
