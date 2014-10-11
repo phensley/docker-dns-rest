@@ -1,0 +1,104 @@
+#!/usr/bin/env python
+
+# dnsrest - restful dns service for associating domain names with docker containers
+
+
+# monkey patch
+from gevent import monkey
+monkey.patch_all()
+
+# core
+import argparse
+import os
+import signal
+import sys
+from urlparse import urlparse
+
+# local
+from dnsrest.logger import init_logger, log
+from dnsrest.monitor import DockerMonitor
+from dnsrest.namesrv import DnsServer
+from dnsrest.registry import Registry
+from dnsrest.restapi import OperationsApi
+
+# libs
+import docker
+import falcon
+import gevent
+from gevent.wsgi import WSGIServer
+
+
+PROCESS = 'dnsrest'
+DOCKER_SOCK = 'unix:///docker.sock'
+DNS_BINDADDR = '0.0.0.0:53'
+DNS_RESOLVER = ['8.8.8.8']
+REST_BINDADDR = '0.0.0.0:5080'
+EPILOG = '<tbd>'
+
+
+def check(args):
+    url = urlparse(args.docker)
+    if url.scheme in ('unix','unix+http'):
+        # check if the socket file exists
+        if not os.path.exists(url.path):
+            log.error('unix socket %r does not exist', url.path)
+            sys.exit(1)
+
+
+def parse_args():
+    docker_url = os.environ.get('DOCKER_HOST')
+    if not docker_url:
+        docker_url = DOCKER_SOCK
+    parser = argparse.ArgumentParser(PROCESS, epilog=EPILOG,
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser.add_argument('--docker', default=docker_url,
+        help='Url to docker TCP/UNIX socket')
+    parser.add_argument('--dns-bind', default=DNS_BINDADDR,
+        help='Bind address for DNS server')
+    parser.add_argument('--rest-bind', default=REST_BINDADDR,
+        help='Bind address for REST API server')
+    parser.add_argument('--resolver', default=DNS_RESOLVER, nargs='*',
+        help='Servers for recursive DNS resolution')
+    parser.add_argument('--no-recursion', action='store_const', const=1,
+        help='Disables recursive DNS queries')
+    parser.add_argument('--verbose', action='store_const', const=1,
+        help='Be more verbose')
+    parser.add_argument('-q', '--quiet', action='store_const', const=0,
+        help='Quiet mode')
+    return parser.parse_args()
+
+
+def stop(*servers):
+    for svr in servers:
+        if svr.started:
+            svr.stop()
+    sys.exit(signal.SIGINT)
+
+
+def main():
+    args = parse_args()
+    check(args)
+    init_logger(process=PROCESS, quiet=args.quiet, verbose=args.verbose)
+    resolver = () if args.no_recursion else args.resolver
+
+    registry = Registry()
+ 
+    app = falcon.API()
+    app.add_route('/container/{label}/{arg}', OperationsApi(registry))
+
+
+    api = WSGIServer(args.rest_bind, app)
+    dns = DnsServer(args.dns_bind, registry, resolver)
+
+    api.start()
+    dns.start()
+    gevent.signal(signal.SIGINT, stop, api, dns)
+
+    client = docker.Client(args.docker)
+    monitor = DockerMonitor(client, registry)
+    gevent.wait([gevent.spawn(monitor.run)])
+
+
+if __name__ == '__main__':
+    main()
+
