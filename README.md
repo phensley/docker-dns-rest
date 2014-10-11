@@ -55,16 +55,18 @@ Now, start up a container with that name:
     % docker run -it --name www ubuntu bash
     root@db8fabbaf1d6:/#
     
-    ... in a separate shell run ...
-    % docker inspect -f '{{.NetworkSettings.IPAddress}}' www
-    172.17.0.3
-
 You should see some output in the DNS log:
 
     192.168.222.1 - - [2014-10-11 15:25:34] "PUT /container/name/www HTTP/1.1" 200 134 0.000366
     2014-10-11T15:26:29.198673 [dnsrest] setting www (83854cf229) as active
     2014-10-11T15:26:29.198821 [dnsrest] added *.example.com. -> 172.17.0.3
     2014-10-11T15:26:29.198900 [dnsrest] added www.staging.internal.com. -> 172.17.0.3
+
+Confirm the `www` container's IP address:
+
+    % docker inspect -f '{{.NetworkSettings.IPAddress}}' www
+    172.17.0.3
+
 
 Now you can query some names against the DNS server:
 
