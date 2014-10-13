@@ -48,6 +48,10 @@ class Registry(object):
                     desc = self._desc(container)
                     self._activate(desc, names, container.addr)
 
+    def get(self, key):
+        with self._lock:
+            return [n.idna().rstrip('.') for n in self._mappings.get(key, ())]
+
     def remove(self, key):
         with self._lock:
             old_names = self._mappings.get(key, ())

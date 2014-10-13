@@ -19,8 +19,7 @@ class OperationsApi(object):
     def on_get(self, req, res, label, arg):
         key = self._key(label, arg)
         record = self.registry.get(key)
-        data = {'code': 0, 'record': record}
-        self._ok(res, json.dumps(data))
+        self._ok(res, {'code': 0, 'record': record})
 
     def on_put(self, req, res, label, arg):
         data = self._parse(req)
