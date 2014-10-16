@@ -72,5 +72,5 @@ class OperationsApi(object):
     def _validate_type(self, key, val, *types):
         if not isinstance(val, types):
             self._fail('The %s must be of type %r, not %r' % \
-                (key, type(val), types))
+                (key, types, type(val)))
 
