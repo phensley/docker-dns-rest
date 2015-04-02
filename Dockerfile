@@ -1,4 +1,6 @@
-FROM python:2.7-onbuild
+FROM alpine:3.1
 MAINTAINER "Patrick Hensley <spaceboy@indirect.com>"
-ENTRYPOINT ["./docker_dnsrest"]
+COPY . /data
+RUN /data/bootstrap
+ENTRYPOINT ["/data/docker_dnsrest"]
 
