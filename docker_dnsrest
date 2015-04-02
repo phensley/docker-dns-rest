@@ -30,9 +30,10 @@ from gevent.wsgi import WSGIServer
 
 PROCESS = 'dnsrest'
 DOCKER_SOCK = 'unix:///docker.sock'
+DOCKER_VERSION = '1.14'
 DNS_BINDADDR = '0.0.0.0:53'
 DNS_RESOLVER = ['8.8.8.8']
-REST_BINDADDR = '0.0.0.0:5080'
+REST_BINDADDR = '0.0.0.0:80'
 EPILOG = '<tbd>'
 
 
@@ -95,7 +96,7 @@ def main():
     for signum in (signal.SIGTERM, signal.SIGINT):
         gevent.signal(signum, stop, api, dns)
 
-    client = docker.Client(args.docker)
+    client = docker.Client(args.docker, version=DOCKER_VERSION)
     monitor = DockerMonitor(client, registry)
     gevent.wait([gevent.spawn(monitor.run)])
 
