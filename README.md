@@ -18,9 +18,11 @@ Usage
 -----
 
 
-First, start docker-dns-rest container:
+First, start docker-dns-rest container. The docker-dns-rest container listens
+on port 80 by default, so depending on how you run Docker you may need to map
+a host port:
 
-    % docker run -d -v /var/run/docker.sock:/docker.sock --name dns \
+    % docker run -d -p 5080:80 -v /var/run/docker.sock:/docker.sock --name dns \
         phensley/docker-dns-rest --verbose 
 
 Tail the logs:
@@ -44,7 +46,7 @@ the container name `www`:
 
     % curl -X PUT \
         -d '{"domains": ["*.example.com", "www.staging.internal.com"]}' \
-        http://172.17.0.2:5080/container/name/www
+        http://172.17.0.2:80/container/name/www
     {"code": 0}
 
 Now, start up a container with that name:

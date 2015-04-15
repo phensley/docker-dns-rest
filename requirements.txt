@@ -1,6 +1,6 @@
 
 dnslib
-docker-py
+docker-py>=0.5.3
 falcon
 gevent
 
