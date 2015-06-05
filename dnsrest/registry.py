@@ -108,7 +108,7 @@ class Registry(object):
             res = self._domains.get(name)
             if res:
                 addrs = [a for a, _ in res]
-                log.debug('resolved %s -> %s' % (name, ' '.join(addrs)))
+                log.debug('resolved %s -> %s' % (name, ', '.join(addrs)))
                 return addrs
             else:
                 log.debug('no mapping for %s' % name)
