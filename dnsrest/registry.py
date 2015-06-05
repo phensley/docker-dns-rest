@@ -51,7 +51,7 @@ class Registry(object):
             for container in self._active.itervalues():
                 if key in ('name:/' + container.name, 'id:/' + container.id):
                     desc = self._desc(container)
-                    self._activate(desc, names, container.addr, tag=key)
+                    self._activate(names, container.addr, tag=key)
 
     def get(self, key):
         with self._lock:
@@ -67,6 +67,14 @@ class Registry(object):
                 self._deactivate(old_mapping.names, tag=old_mapping.key)
                 del self._mappings[old_mapping.key]
 
+    def activate_static(self, domain, addr):
+        with self._lock:
+            self._activate([domain], addr, tag='domain:/%s' % domain)
+
+    def deactivate_static(self, domain):
+        with self._lock:
+            self._deactivate([domain], tag='domain:/%s' % domain)
+
     def activate(self, container):
         'Activate all rules associated with this container'
         desc = self._desc(container)
@@ -76,7 +84,7 @@ class Registry(object):
             if mapping:
                 log.info('setting %s as active' % desc)
                 key, names = mapping.key, mapping.names
-                self._activate(desc, names, container.addr, tag=key)
+                self._activate(names, container.addr, tag=key)
 
     def deactivate(self, container):
         'Deactivate all rules associated with this container'
@@ -108,7 +116,7 @@ class Registry(object):
     def dump(self):
         return json.dumps(self._domains.to_dict(), indent=4, sort_keys=1)
 
-    def _activate(self, desc, names, addr, tag=None):
+    def _activate(self, names, addr, tag=None):
         for name in names:
             self._domains.put(name, addr, tag)
             log.info('added %s -> %s key=%s', name.idna(), addr, tag)
