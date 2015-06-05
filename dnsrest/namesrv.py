@@ -38,10 +38,13 @@ class DnsServer(DatagramServer):
                 addr = self._resolve('.'.join(rec.q.qname.label))
         self.socket.sendto(self._reply(rec, addr), peer)
 
-    def _reply(self, rec, addr=None):
+    def _reply(self, rec, addrs=None):
         reply = DNSRecord(DNSHeader(id=rec.header.id, qr=1, aa=1, ra=1), q=rec.q)
-        if addr:
-            reply.add_answer(RR(rec.q.qname, QTYPE.A, rdata=A(addr)))
+        if addrs:
+            if not isinstance(addrs, list):
+                addrs = [addrs]
+            for addr in addrs:
+                reply.add_answer(RR(rec.q.qname, QTYPE.A, rdata=A(addr)))
         return reply.pack()
 
     def _resolve(self, name):
