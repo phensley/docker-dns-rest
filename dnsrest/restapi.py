@@ -12,9 +12,12 @@ class BaseApi(object):
     def __init__(self, registry):
         self.registry = registry
 
-    def _ok(self, res, data):
+    def _ok(self, res, data, indent=0):
         res.status = falcon.HTTP_200
-        res.body = json.dumps(data)
+        if indent:
+            res.body = json.dumps(data, indent=4, sort_keys=1)
+        else:
+            res.body = json.dumps(data)
 
     def _fail(self, msg):
         raise falcon.HTTPError(falcon.HTTP_500, 'Error', msg)
@@ -120,5 +123,14 @@ class ContainerApi(BaseApi):
         for name in domains:
             res.append(self._validate_domain(name))
         return res
+
+
+class DebugApi(BaseApi):
+
+    def __init__(self, registry):
+        BaseApi.__init__(self, registry)
+
+    def on_get(self, req, res):
+        self._ok(res, self.registry._domains.to_dict(), indent=1)
 
 

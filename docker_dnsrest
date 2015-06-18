@@ -19,7 +19,7 @@ from dnsrest.logger import init_logger, log
 from dnsrest.monitor import DockerMonitor
 from dnsrest.namesrv import DnsServer
 from dnsrest.registry import Registry
-from dnsrest.restapi import StaticApi, ContainerApi
+from dnsrest.restapi import StaticApi, ContainerApi, DebugApi
 
 # libs
 import docker
@@ -87,7 +87,7 @@ def main():
     app = falcon.API()
     app.add_route('/container/{label}/{arg}', ContainerApi(registry))
     app.add_route('/domain/{domain}', StaticApi(registry))
-
+    app.add_route('/debug', DebugApi(registry))
 
     api = WSGIServer(args.rest_bind, app)
     dns = DnsServer(args.dns_bind, registry, resolver)
