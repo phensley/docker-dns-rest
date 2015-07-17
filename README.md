@@ -44,7 +44,7 @@ Next, add some names to the DNS registry.  We can associate one or more names
 with a container by `id` or `name`.  We'll associate some domain names with
 the container name `www`:
 
-    % curl -X PUT \
+    % curl -X PUT -H 'Content-Type: application/json' \
         -d '{"domains": ["*.example.com", "www.staging.internal.com"]}' \
         http://172.17.0.2:80/container/name/www
     {"code": 0}
