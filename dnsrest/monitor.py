@@ -39,8 +39,10 @@ class DockerMonitor(object):
         # read the docker event stream and update the name table
         for raw in events:
             evt = json.loads(raw)
-            cid = evt['id']
-            status = evt['status']
+            cid = evt.get('id')
+            if cid is None:
+                continue
+            status = evt.get('status')
             if status in ('start', 'die'):
                 try:
                     rec = self._inspect(cid)
