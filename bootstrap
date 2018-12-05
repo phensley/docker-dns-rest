@@ -1,9 +1,12 @@
 #!/bin/sh
 
-PY=2.7.11-r3
-apk add --update python=$PY python-dev=$PY gcc libgcc libc-dev py-pip libev
-pip install -r /data/requirements.txt
-apk del python-dev gcc libgcc libc-dev py-pip libev
+PY=3.6.6-r0
+apk add --update python3=$PY python3-dev=$PY gcc libgcc libc-dev py3-pip libev
+pip3 install --upgrade pip
+pip3 install -r /data/requirements.txt
+if [ ! -e /usr/bin/pip ]; then ln -s pip3 /usr/bin/pip ; fi && \
+if [[ ! -e /usr/bin/python ]]; then ln -sf /usr/bin/python3 /usr/bin/python; fi && \
+apk del python3-dev gcc libgcc libc-dev py-pip libev
 rm -rf /tmp/*
 rm -rf /var/cache/apk/*
 

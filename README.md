@@ -40,6 +40,11 @@ Get the IP of the DNS container:
     % docker inspect -f '{{.NetworkSettings.IPAddress}}' dns
     172.17.0.2
 
+The previous command will fail if a user defined network is present. In this case use:
+
+    % docker inspect -f '{{.NetworkSettings.Networks.yournetwork.IPAddress}}' dns
+    172.17.0.2
+
 Next, add some names to the DNS registry.  We can associate one or more names
 with a container by `id` or `name`.  We'll associate some domain names with
 the container name `www`:

@@ -25,7 +25,7 @@ class BaseApi(object):
     def _parse(self, req):
         try:
             return json.loads(req.stream.read())
-        except Exception, ex:
+        except Exception as ex:
             raise falcon.HTTPError(falcon.HTTP_400, 'Error', ex.message)
 
     def _validate_type(self, key, val, *types):
@@ -34,10 +34,10 @@ class BaseApi(object):
                 (key, types, type(val)))
     
     def _validate_domain(self, domain):
-        self._validate_type('domain name', domain, (str, unicode))
+        self._validate_type('domain name', domain, (str))
         try:
             return DNSLabel(domain)
-        except Exception, e:
+        except Exception as e:
             self._fail('Domain name parsing failed %s' % e)
 
     def _validate_ips(self, ips):
@@ -46,7 +46,7 @@ class BaseApi(object):
         for ip in ips:
             try:
                 ip = A(ip)
-            except Exception, e:
+            except Exception as e:
                 self._fail('Address parsing failed %s' % e)
 
 

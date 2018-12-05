@@ -34,7 +34,7 @@ class Logger(object):
     def _log(self, msg, *args):
             now = datetime.now().isoformat()
             line = '%s [%s] %s\n' % (now, self._process, msg % args)
-            sys.stderr.write(line.encode('utf-8'))
+            sys.stderr.buffer.write(line.encode('utf-8'))
             sys.stderr.flush()
 
 

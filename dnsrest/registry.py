@@ -3,8 +3,8 @@
 import json
 
 # local
-from logger import log
-from nodez import Node
+from dnsrest.logger import log
+from dnsrest.nodez import Node
 
 # libs
 from gevent import threading
@@ -48,7 +48,7 @@ class Registry(object):
             # check if these pertain to any already-active containers and
             # activate the domain names
             activate = []
-            for container in self._active.itervalues():
+            for container in self._active.values():
                 if key in ('name:/' + container.name, 'id:/' + container.id):
                     desc = self._desc(container)
                     self._activate(names, container.addr, tag=key)
@@ -108,7 +108,7 @@ class Registry(object):
             res = self._domains.get(name)
             if res:
                 addrs = [a for a, _ in res]
-                log.debug('resolved %s -> %s' % (name, ', '.join(addrs)))
+                log.debug('resolved %s -> %s', name, ', '.join(map(str,addrs)))
                 return addrs
             else:
                 log.debug('no mapping for %s' % name)
@@ -120,7 +120,7 @@ class Registry(object):
         for name in names:
             self._domains.put(name, addr, tag)
             log.info('added %s -> %s key=%s', name.idna(), addr, tag)
-        #log.debug('tree %s' % self.dump())
+        #log.debug('tree %s', self.dump())
 
     def _deactivate(self, names, tag=None):
         for name in names:

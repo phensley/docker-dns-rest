@@ -1,8 +1,12 @@
 
 # core
 from collections import namedtuple
+from functools import reduce
 import json
 import re
+
+from dnsrest.logger import log
+
 
 
 RE_VALIDNAME = re.compile('[^\w\d.-]')
@@ -51,8 +55,8 @@ class DockerMonitor(object):
                             self._registry.activate(rec)
                         else:
                             self._registry.deactivate(rec)
-                except Exception, e:
-                    print str(e)
+                except Exception as e:
+                    print("exception occured: {0}".format(e))
 
     def _inspect(self, cid):
         # get full details on this container from docker
@@ -63,10 +67,20 @@ class DockerMonitor(object):
         if not name:
             return None
         name = RE_VALIDNAME.sub('', name).rstrip('.')
+
+        # fetch IP address from "networks" section
+        addr = None
+        for nw in get(rec, 'NetworkSettings', 'Networks'):
+            addr = get(rec, 'NetworkSettings', 'Networks', nw, 'IPAddress')
+
+        # fall back to legacy mode
+        if (addr == None):
+            addr = get(rec, 'NetworkSettings', 'IPAddress')
+
         return Container(
             get(rec, 'Id'),
             name,
             get(rec, 'State', 'Running'),
-            get(rec, 'NetworkSettings', 'IPAddress')
+            addr
         )
 

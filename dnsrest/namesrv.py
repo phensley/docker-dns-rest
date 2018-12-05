@@ -35,7 +35,7 @@ class DnsServer(DatagramServer):
         if rec.q.qtype in (QTYPE.A, QTYPE.AAAA):
             addr = self._registry.resolve(rec.q.qname.idna())
             if not addr:
-                addr = self._resolve('.'.join(rec.q.qname.label))
+                addr = self._resolve('.'.join(str(rec.q.qname.label)))
         self.socket.sendto(self._reply(rec, addr), peer)
 
     def _reply(self, rec, addrs=None):
@@ -44,7 +44,8 @@ class DnsServer(DatagramServer):
             if not isinstance(addrs, list):
                 addrs = [addrs]
             for addr in addrs:
-                reply.add_answer(RR(rec.q.qname, QTYPE.A, rdata=A(addr)))
+                if addr:
+                    reply.add_answer(RR(rec.q.qname, QTYPE.A, rdata=A(addr)))
         return reply.pack()
 
     def _resolve(self, name):
@@ -52,8 +53,8 @@ class DnsServer(DatagramServer):
             return None
         try:
             return self._resolver.gethostbyname(name)
-        except socket.gaierror, e:
+        except socket.gaierror as e:
             msg = str(e)
             if not contains(msg, 'ETIMEOUT', 'ENOTFOUND'):
-                print msg
+                print(msg)
 
