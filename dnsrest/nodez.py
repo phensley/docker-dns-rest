@@ -25,7 +25,7 @@ class Node(object):
         r = {}
         r[':addr'] = self._addr
         r[':wild'] = self._wildcard
-        for key, sub in self._subs.iteritems():
+        for key, sub in self._subs.items():
             r[key] = sub.to_dict()
         return r
 
@@ -46,7 +46,7 @@ class Node(object):
     def _put(self, label, addr, tag=None):
         part = label.pop()
 
-        if not label and part == '*':
+        if not label and part == b'*':
             self._wildcard = 1
             self._addr.append((addr, tag))
             return

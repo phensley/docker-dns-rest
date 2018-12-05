@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # dnsrest - restful dns service for associating domain names with docker containers
 
@@ -12,7 +12,7 @@ import argparse
 import os
 import signal
 import sys
-from urlparse import urlparse
+from urllib.parse import urlparse
 
 # local
 from dnsrest.logger import init_logger, log
@@ -25,12 +25,12 @@ from dnsrest.restapi import StaticApi, ContainerApi, DebugApi
 import docker
 import falcon
 import gevent
-from gevent.wsgi import WSGIServer
+from gevent.pywsgi import WSGIServer
 
 
 PROCESS = 'dnsrest'
 DOCKER_SOCK = 'unix:///docker.sock'
-DOCKER_VERSION = '1.14'
+DOCKER_VERSION = '1.29'
 DNS_BINDADDR = '0.0.0.0:53'
 DNS_RESOLVER = ['8.8.8.8']
 REST_BINDADDR = '0.0.0.0:80'
