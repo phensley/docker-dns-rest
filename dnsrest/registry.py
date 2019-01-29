@@ -104,6 +104,7 @@ class Registry(object):
 
     def resolve(self, name):
         'Resolves the address for this name, if any'
+        log.debug('Resolve %s', name)
         with self._lock:
             res = self._domains.get(name)
             if res:
