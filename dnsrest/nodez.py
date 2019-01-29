@@ -11,6 +11,7 @@ class Node(object):
         self._subs = {}
         self._wildcard = 0
         self._addr = []
+        self._addr_index = 0
 
     def get(self, name):
         return self._get(self._label(name))
@@ -34,7 +35,10 @@ class Node(object):
 
     def _get(self, label):
         if not label:
-            return self._addr
+            self._addr_index += 1
+            if len(self._addr) != 0:
+                self._addr_index %= len(self._addr)
+            return self._addr[self._addr_index:] + self._addr[:self._addr_index]
         part = label.pop()
         sub = self._subs.get(part)
         if sub:
